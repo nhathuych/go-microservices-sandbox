@@ -1,0 +1,103 @@
+{{template "base" .}}
+
+{{define "content"}}
+<div class="container mx-auto px-4 py-10">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold border-b pb-4 mb-6">Test Go Microservices</h1>
+    
+    <div class="flex flex-wrap gap-3 mb-8">
+      <button id="brokerBtn" class="px-4 py-2 border-2 border-slate-500 text-slate-600 rounded hover:bg-slate-500 hover:text-white transition duration-200 font-medium">Test Broker</button>
+      <button id="authBrokerBtn" class="px-4 py-2 border-2 border-slate-500 text-slate-600 rounded hover:bg-slate-500 hover:text-white transition duration-200 font-medium">Test Auth</button>
+      <button id="mailBtn" class="px-4 py-2 border-2 border-slate-500 text-slate-600 rounded hover:bg-slate-500 hover:text-white transition duration-200 font-medium">Test Email</button>
+      <button id="logBtn" class="px-4 py-2 border-2 border-slate-500 text-slate-600 rounded hover:bg-slate-500 hover:text-white transition duration-200 font-medium">Test Log</button>
+      <button id="logGBtn" class="px-4 py-2 border-2 border-slate-500 text-slate-600 rounded hover:bg-slate-500 hover:text-white transition duration-200 font-medium">Test gRPC Log</button>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8 min-h-[150px]">
+      <div id="output">
+        <span class="text-gray-400 italic">Output shows here...</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-slate-800 rounded-lg p-6 shadow-inner">
+        <h4 class="text-slate-300 font-semibold mb-3 uppercase text-xs tracking-wider">Sent</h4>
+        <pre id="payload" class="text-emerald-400 overflow-x-auto text-sm"><span class="text-slate-500">Nothing sent yet...</span></pre>
+      </div>
+
+      <div class="bg-slate-800 rounded-lg p-6 shadow-inner">
+        <h4 class="text-slate-300 font-semibold mb-3 uppercase text-xs tracking-wider">Received</h4>
+        <pre id="received" class="text-sky-400 overflow-x-auto text-sm"><span class="text-slate-500">Nothing received yet...</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}
+
+{{define "js"}}
+<script>
+  const BROKER_URL = "http://localhost:8081";
+  const output = document.getElementById("output");
+  const sent = document.getElementById("payload");
+  const received = document.getElementById("received");
+
+  async function sendRequest(url, payload = null) {
+    started();
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+
+    const options = {
+      method: 'POST',
+      headers: headers,
+    };
+    if (payload) options.body = JSON.stringify(payload);
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+
+      sent.innerText = payload ? JSON.stringify(payload, undefined, 2) : "empty post request";
+      received.innerText = JSON.stringify(data, undefined, 2);
+
+      if (data.error) {
+        output.innerHTML += `<br><span class="text-red-600 font-semibold italic">Error: ${data.message}</span>`;
+      } else {
+        output.innerHTML += `<br><span class="text-indigo-600 font-semibold uppercase text-sm">Response from service:</span> ${data.message}`;
+      }
+    } catch (error) {
+      output.innerHTML += `<br><br><span class="text-red-700 font-bold font-mono">CRITICAL ERROR: ${error}</span>`;
+    } finally {
+      ended();
+    }
+  }
+
+  document.getElementById("brokerBtn").addEventListener("click", () => sendRequest(BROKER_URL));
+  document.getElementById("authBrokerBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/handle`, {
+    action: "auth",
+    auth: { email: "huy@gmail.com", password: "123456" }
+  }));
+  document.getElementById("mailBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/handle`, {
+    action: "mail",
+    mail: { from: "me@gmail.com", to: "you@gmail.com", subject: "Test Email", message: "Hello Tailwind!" }
+  }));
+  document.getElementById("logBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/handle`, {
+    action: "log",
+    log: { name: "event", data: "Log entry" }
+  }));
+  document.getElementById("logGBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/log-grpc`, {
+    action: "log",
+    log: { name: "event", data: "gRPC entry" }
+  }));
+
+  function started() {
+    let now = new Date();
+    output.innerHTML = `<span class="text-green-600 font-bold">Started:</span> <span class="text-gray-500">${now.toLocaleTimeString()}</span><br><em class="text-gray-400">Dispatching request...</em>`;
+    received.innerHTML = `<span class="text-slate-500 italic">Waiting...</span>`;
+  }
+
+  function ended() {
+    let now = new Date();
+    output.innerHTML += `<br><span class="text-red-500 font-bold">Ended:</span> <span class="text-gray-500">${now.toLocaleTimeString()}</span>`;
+  }
+</script>
+{{end}}
