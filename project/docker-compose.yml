@@ -1,0 +1,11 @@
+services:
+  broker-service:
+    build:
+      context: ./../broker-service
+      dockerfile: ./../broker-service/broker-service.dockerfile
+    restart: always
+    ports:
+      - "8081:8080"
+    deploy:
+      mode: replicated  # Nếu có quá nhiều request tới Broker thì một mình nó gánh không nổi -> cần "nhân bản" nó ra
+      replicas: 1       # Số lượng bản sao
