@@ -9,3 +9,32 @@ services:
     deploy:
       mode: replicated  # Nếu có quá nhiều request tới Broker thì một mình nó gánh không nổi -> cần "nhân bản" nó ra
       replicas: 1       # Số lượng bản sao
+
+  authentication-service:
+    build:
+      context: ./../authentication-service
+      dockerfile: ./../authentication-service/authentication-service.dockerfile
+    restart: always
+    ports:
+      - "8082:8080"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DSN: "host=postgres port=5432 user=postgres password=postgres dbname=auth-service-db sslmode=disable timezone=UTC connect_timeout=5"
+
+  postgres:
+    image: postgres:17
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-data/postgres:/var/lib/postgresql/data/
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_DB: auth-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata

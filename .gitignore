@@ -6,6 +6,7 @@ bin/
 *.so
 *.dylib
 brokerApp
+authApp
 frontApp
 
 # Test binary, built with `go test -c`
@@ -19,6 +20,7 @@ profile.cov
 
 # Dependency directories
 vendor/
+db-data/
 
 # Hot reload temporary files (e.g., for Air or other watchers)
 tmp/
