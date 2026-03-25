@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"net/http"
 )
 
@@ -12,4 +15,67 @@ func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = app.writeJSON(w, http.StatusOK, payload)
+}
+
+// API Gateway: Nhận request tập trung và điều phối sang các service nội bộ (Auth, Log, Mail...) dựa vô field 'action'.
+func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
+	var requestPayload RequestPayload
+
+	if err := app.readJSON(w, r, &requestPayload); err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	switch requestPayload.Action {
+	case "auth":
+		app.authenticate(w, requestPayload.Auth)
+	default:
+		app.errorJSON(w, errors.New("unknow action"))
+	}
+}
+
+// Proxy xác thực: Forward yêu cầu login sang Authentication Service và chuẩn hóa kết quả trả về cho Client.
+func (app *Config) authenticate(w http.ResponseWriter, authPayload AuthPayload) {
+	jsonData, _ := json.MarshalIndent(authPayload, "", "\t")
+
+	request, err := http.NewRequest("POST", "http://authentication-service/authenticate", bytes.NewBuffer(jsonData))
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode == http.StatusUnauthorized {
+		app.errorJSON(w, errors.New("invalid credentials"))
+		return
+	} else if response.StatusCode != http.StatusAccepted {
+		app.errorJSON(w, errors.New("error calling auth service"))
+		return
+	}
+
+	var jsonFromService jsonResponse
+	if err := json.NewDecoder(response.Body).Decode(&jsonFromService); err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	if jsonFromService.Error {
+		app.errorJSON(w, err, http.StatusUnauthorized)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "Authenticated!",
+		Data:    jsonFromService.Data,
+	}
+
+	app.writeJSON(w, http.StatusAccepted, payload)
 }
