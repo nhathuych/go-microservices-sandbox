@@ -15,7 +15,7 @@ import (
 	"github.com/nhathuych/go-microservices-sandbox/authentication-service/auth"
 )
 
-const PORT = "8082"
+const serverPort = "80"
 
 var counts int64
 
@@ -38,7 +38,7 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%s", PORT),
+		Addr:    fmt.Sprintf(":%s", serverPort),
 		Handler: app.route(),
 	}
 

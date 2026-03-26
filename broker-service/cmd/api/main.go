@@ -7,17 +7,17 @@ import (
 	"time"
 )
 
-const PORT = "8080"
+const serverPort = "80"
 
 type Config struct{}
 
 func main() {
 	app := Config{}
 
-	log.Printf("Broker service is starting on port %s\n", PORT)
+	log.Printf("Broker service is starting on port %s\n", serverPort)
 
 	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%s", PORT),
+		Addr:         fmt.Sprintf(":%s", serverPort),
 		Handler:      app.route(),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,

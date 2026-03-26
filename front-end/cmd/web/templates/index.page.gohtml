@@ -74,7 +74,7 @@
   document.getElementById("brokerBtn").addEventListener("click", () => sendRequest(BROKER_URL));
   document.getElementById("authBrokerBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/handle`, {
     action: "auth",
-    auth: { email: "huy@gmail.com", password: "123456" }
+    auth: { email: "admin@example.com", password: "123456" }
   }));
   document.getElementById("mailBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/handle`, {
     action: "mail",
