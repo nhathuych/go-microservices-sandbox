@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"net/http"
 	"time"
 
+	"github.com/nhathuych/go-microservices-sandbox/logger-service/data"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
@@ -18,7 +21,9 @@ const (
 
 var client *mongo.Client
 
-type Config struct{}
+type Config struct {
+	Model data.Model
+}
 
 func main() {
 	mongoClient, err := connectToMongo()
@@ -35,6 +40,23 @@ func main() {
 			panic(err)
 		}
 	}()
+
+	app := Config{
+		Model: data.New(client),
+	}
+
+	go app.serve()
+}
+
+func (app *Config) serve() {
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", serverPort),
+		Handler: app.route(),
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		log.Panic(err)
+	}
 }
 
 func connectToMongo() (*mongo.Client, error) {
