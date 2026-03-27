@@ -10,6 +10,15 @@ services:
       mode: replicated  # Nếu có quá nhiều request tới Broker thì một mình nó gánh không nổi -> cần "nhân bản" nó ra
       replicas: 1       # Số lượng bản sao
 
+  logger-service:
+    build:
+      context: ./../logger-service
+      dockerfile: ./../logger-service/logger-service.dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+
   authentication-service:
     build:
       context: ./../authentication-service
@@ -29,7 +38,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db-data/postgres:/var/lib/postgresql/data/
+      - pg_data:/var/lib/postgresql/data/
     deploy:
       mode: replicated
       replicas: 1
@@ -38,3 +47,19 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       PGDATA: /var/lib/postgresql/data/pgdata
+
+  mongo:
+    image: mongo:8
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: logger-service-db
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+
+volumes:
+  pg_data:
+  mongo_data:

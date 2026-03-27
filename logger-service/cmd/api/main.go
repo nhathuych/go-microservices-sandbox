@@ -45,7 +45,7 @@ func main() {
 		Model: data.New(client),
 	}
 
-	go app.serve()
+	app.serve()
 }
 
 func (app *Config) serve() {
@@ -54,6 +54,7 @@ func (app *Config) serve() {
 		Handler: app.route(),
 	}
 
+	fmt.Println("Starting logging web service on port", serverPort)
 	if err := srv.ListenAndServe(); err != nil {
 		log.Panic(err)
 	}
@@ -62,8 +63,9 @@ func (app *Config) serve() {
 func connectToMongo() (*mongo.Client, error) {
 	clientOptions := options.Client().ApplyURI(mongoURL)
 	clientOptions.SetAuth(options.Credential{
-		Username: "admin",
-		Password: "password",
+		AuthSource: "admin",
+		Username:   "admin",
+		Password:   "password",
 	})
 
 	c, err := mongo.Connect(clientOptions)
@@ -76,5 +78,6 @@ func connectToMongo() (*mongo.Client, error) {
 		return nil, err
 	}
 
+	log.Println("Connected to mongo.")
 	return c, nil
 }
