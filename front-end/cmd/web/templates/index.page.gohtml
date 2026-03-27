@@ -82,7 +82,7 @@
   }));
   document.getElementById("logBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/handle`, {
     action: "log",
-    log: { name: "event", data: "Log entry" }
+    log: { name: "event", data: `Log entry created at ${new Date().toLocaleTimeString()} (ID: ${Math.floor(Math.random() * 10000)})` }
   }));
   document.getElementById("logGBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/log-grpc`, {
     action: "log",
