@@ -15,5 +15,7 @@ func (app *Config) route() http.Handler {
 	mux.Use(middleware.Logger)
 	mux.Use(middleware.Recoverer)
 
+	mux.Post("/send", app.SendMail)
+
 	return mux
 }
