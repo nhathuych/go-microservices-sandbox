@@ -78,7 +78,7 @@
   }));
   document.getElementById("mailBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/handle`, {
     action: "mail",
-    mail: { from: "me@gmail.com", to: "you@gmail.com", subject: "Test Email", message: "Hello Tailwind!" }
+    mail: { from: "me@gmail.com", to: "you@gmail.com", subject: `Test Email #${id = Math.floor(Math.random() * 1000)}`, message: `System test triggered at ${new Date().toLocaleTimeString()}` }
   }));
   document.getElementById("logBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/handle`, {
     action: "log",

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"html/template"
+	"log"
 	"time"
 
 	mail "github.com/xhit/go-simple-mail/v2"
@@ -67,6 +68,7 @@ func (m *Mail) SendSMTPMessage(msg Message) error {
 
 	smtpClient, err := server.Connect()
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 
@@ -83,7 +85,12 @@ func (m *Mail) SendSMTPMessage(msg Message) error {
 		}
 	}
 
-	return email.Send(smtpClient)
+	if err := email.Send(smtpClient); err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
 }
 
 func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
