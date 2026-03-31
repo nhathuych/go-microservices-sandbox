@@ -10,6 +10,7 @@ authApp
 frontApp
 loggerApp
 mailerApp
+listenerApp
 
 # Test binary, built with `go test -c`
 *.test
