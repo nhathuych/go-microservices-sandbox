@@ -84,6 +84,19 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  rabbitmq:
+    image: rabbitmq:4.2-management-alpine
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    deploy:
+      mode: replicated
+      replicas: 1
+
 volumes:
   pg_data:
   mongo_data:
+  rabbitmq_data:
