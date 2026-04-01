@@ -23,3 +23,8 @@ type MailPayload struct {
 	Subject string `json:"subject"`
 	Message string `json:"message"`
 }
+
+type RPCPayload struct {
+	Name string
+	Data string
+}

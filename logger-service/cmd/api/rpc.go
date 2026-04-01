@@ -28,6 +28,8 @@ func (R *RPCServer) LogInfo(payload RPCPayload, resp *string) error {
 		return err
 	}
 
+	// Gán kết quả vô *resp. Lưu ý: Đây chỉ là quy ước cú pháp của net/rpc để Go tự đóng gói (serialize)
+	// và gởi dữ liệu qua mạng, các service không hề dùng chung vùng nhớ hay con trỏ thiệt
 	*resp = "Processed payload via RPC:" + payload.Name
 
 	return nil

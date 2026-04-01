@@ -48,7 +48,11 @@ func main() {
 	}
 
 	// Register the RPC Server
+	// Go dùng Reflection để tự động ánh xạ các method public của struct này
+	// thành các "hàm từ xa" có thể gọi được (ví dụ: "RPCServer.LogInfo").
 	err = rpc.Register(new(RPCServer))
+	// Chạy RPC server trên một Goroutine riêng (non-blocking) để không làm treo luồng chính.
+	// Điều này cho phép ứng dụng lắng nghe đồng thời cả RPC (cổng 5001) và HTTP (cổng 80) bên dưới.
 	go app.rpcListen()
 
 	app.serve()
@@ -56,6 +60,7 @@ func main() {
 
 func (app *Config) rpcListen() error {
 	log.Println("Starting RPC server on port", rpcPort)
+	// Thiết lập lắng nghe kết nối TCP tại port 5001.
 	listen, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", rpcPort))
 	if err != nil {
 		return err
@@ -63,6 +68,7 @@ func (app *Config) rpcListen() error {
 	defer listen.Close()
 
 	for {
+		// Chấp nhận kết nối mới từ Client (như Broker-service).
 		rpcConn, err := listen.Accept()
 		if err != nil {
 			continue
