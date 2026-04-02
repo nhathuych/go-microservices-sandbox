@@ -1,0 +1,22 @@
+syntax = "proto3"; // Khai báo phiên bản Protobuf
+
+package logs; // Namespace nội bộ của Protobuf để tránh xung đột tên gọi giữa các file .proto khác nhau
+
+option go_package = "/logs"; // Chỉ định package khi generate code Go (các file .pb.go)
+
+message Log {
+  string name = 1; // Field Tag 1: Định danh duy nhất cho trường dữ liệu trong quá trình truyền tải nhị phân. Không phải giá trị của biến, mà là ID để hệ thống giải mã (decode) cực nhanh
+  string data = 2; // Field Tag 1: Định danh duy nhất cho trường dữ liệu trong quá trình truyền tải nhị phân. Không phải giá trị của biến, mà là ID để hệ thống giải mã (decode) cực nhanh
+}
+
+message LogRequest {
+  Log logEntry = 1;
+}
+
+message LogResponse {
+  string result = 1;
+}
+
+service LogService { // Interface ("Hợp đồng") định nghĩa các hàm mà Logger Service cung cấp. Client sẽ dựa vào đây để gọi hàm, Server dựa vào đây để triển khai logic
+  rpc WriteLog(LogRequest) returns (LogResponse); // Hàm RPC WriteLog: Truyền tải nhị phân qua HTTP/2
+}
