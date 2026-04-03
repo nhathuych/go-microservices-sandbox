@@ -55,6 +55,9 @@ func main() {
 	// Điều này cho phép ứng dụng lắng nghe đồng thời cả RPC (cổng 5001) và HTTP (cổng 80) bên dưới.
 	go app.rpcListen()
 
+	// Start the gRPC server
+	go app.gRPCListen()
+
 	app.serve()
 }
 
