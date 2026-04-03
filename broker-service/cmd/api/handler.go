@@ -2,12 +2,17 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/rpc"
+	"time"
 
 	"github.com/nhathuych/go-microservices-sandbox/broker-service/event"
+	"github.com/nhathuych/go-microservices-sandbox/broker-service/logs"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // Deep Health Check: kiểm tra coi App Go này có kết nối được với thế giới bên ngoài (RabbitMQ) không
@@ -208,5 +213,44 @@ func (app *Config) logItemViaRPC(w http.ResponseWriter, l LogPayload) {
 		Message: result,
 	}
 
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) LogViaGRPC(w http.ResponseWriter, r *http.Request) {
+	var requestPayload RequestPayload
+	if err := app.readJSON(w, r, &requestPayload); err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	conn, err := grpc.NewClient(
+		"logger-service:50051",
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	defer conn.Close()
+
+	c := logs.NewLogServiceClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	_, err = c.WriteLog(ctx, &logs.LogRequest{
+		LogEntry: &logs.Log{
+			Name: requestPayload.Log.Name,
+			Data: requestPayload.Log.Data,
+		},
+	})
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "logged",
+	}
 	app.writeJSON(w, http.StatusAccepted, payload)
 }

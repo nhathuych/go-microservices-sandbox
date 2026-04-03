@@ -86,7 +86,7 @@
   }));
   document.getElementById("logGBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/log-grpc`, {
     action: "log",
-    log: { name: "event", data: "gRPC entry" }
+    log: { name: "event", data: `gRPC entry created at ${new Date().toLocaleTimeString()} (ID: ${Math.floor(Math.random() * 10000)})` }
   }));
 
   function started() {
