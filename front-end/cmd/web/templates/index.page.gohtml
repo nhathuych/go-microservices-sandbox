@@ -11,6 +11,7 @@
       <button id="mailBtn" class="px-4 py-2 border-2 border-slate-500 text-slate-600 rounded hover:bg-slate-500 hover:text-white transition duration-200 font-medium">Test Email</button>
       <button id="logBtn" class="px-4 py-2 border-2 border-slate-500 text-slate-600 rounded hover:bg-slate-500 hover:text-white transition duration-200 font-medium">Test Log</button>
       <button id="logGBtn" class="px-4 py-2 border-2 border-slate-500 text-slate-600 rounded hover:bg-slate-500 hover:text-white transition duration-200 font-medium">Test gRPC Log</button>
+      <button id="userGBtn" class="px-4 py-2 border-2 border-slate-500 text-slate-600 rounded hover:bg-slate-500 hover:text-white transition duration-200 font-medium">Test gRPC User</button>
     </div>
 
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8 min-h-[150px]">
@@ -87,6 +88,10 @@
   document.getElementById("logGBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/log-grpc`, {
     action: "log",
     log: { name: "event", data: `gRPC entry created at ${new Date().toLocaleTimeString()} (ID: ${Math.floor(Math.random() * 10000)})` }
+  }));
+  document.getElementById("userGBtn").addEventListener("click", () => sendRequest(`${BROKER_URL}/handle`, {
+    action: "get-user",
+    user: { id: 1 }
   }));
 
   function started() {

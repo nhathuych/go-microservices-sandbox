@@ -5,6 +5,7 @@ type RequestPayload struct {
 	Auth   AuthPayload `json:"auth,omitempty"`
 	Log    LogPayload  `json:"log,omitempty"`
 	Mail   MailPayload `json:"mail,omitempty"`
+	User   UserPayload `json:"user,omitempty"`
 }
 
 type AuthPayload struct {
@@ -27,4 +28,8 @@ type MailPayload struct {
 type RPCPayload struct {
 	Name string
 	Data string
+}
+
+type UserPayload struct {
+	ID int `json:"id"`
 }

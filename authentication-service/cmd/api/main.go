@@ -37,6 +37,8 @@ func main() {
 		Models: auth.New(conn),
 	}
 
+	go app.gRPCListen()
+
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", serverPort),
 		Handler: app.route(),

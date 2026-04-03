@@ -11,6 +11,7 @@ import (
 
 	"github.com/nhathuych/go-microservices-sandbox/broker-service/event"
 	"github.com/nhathuych/go-microservices-sandbox/broker-service/logs"
+	"github.com/nhathuych/go-microservices-sandbox/broker-service/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -41,6 +42,8 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.logItemViaRPC(w, requestPayload.Log)
 	case "mail":
 		app.sendMail(w, requestPayload.Mail)
+	case "get-user":
+		app.GetUserByIDViaGRPC(w, requestPayload.User)
 	default:
 		app.errorJSON(w, errors.New("unknow action"))
 	}
@@ -251,6 +254,41 @@ func (app *Config) LogViaGRPC(w http.ResponseWriter, r *http.Request) {
 	payload := jsonResponse{
 		Error:   false,
 		Message: "logged",
+	}
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) GetUserByIDViaGRPC(w http.ResponseWriter, userPayload UserPayload) {
+	// Thiết lập kết nối tới Authentication Service
+	conn, err := grpc.NewClient(
+		"authentication-service:50051",
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	defer conn.Close()
+
+	// Tạo client từ service đã định nghĩa trong proto
+	c := proto.NewUserServiceClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	// Gọi hàm gRPC
+	response, err := c.GetUserByID(ctx, &proto.UserRequest{
+		Id: int64(userPayload.ID),
+	})
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	// Trả về kết quả cho Client (Postman/Browser)
+	payload := jsonResponse{
+		Error:   false,
+		Message: "User retrieved via gRPC",
+		Data:    response.User,
 	}
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
