@@ -1,0 +1,86 @@
+version: '3'
+
+services:
+  broker-service:
+    image: nhathuych/broker-service:1.0.0
+    ports:
+      - "8081:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  authentication-service:
+    image: nhathuych/authentication-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DSN: "host=postgres port=5432 user=postgres password=postgres dbname=auth-service-db sslmode=disable timezone=UTC connect_timeout=5"
+
+  listener-service:
+    image: nhathuych/listener-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  logger-service:
+    image: nhathuych/logger-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  mail-service:
+    image: nhathuych/mail-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      MAIL_DOMAIN: localhost
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: none
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      FROM_NAME: "Huy Dev"
+      FROM_ADDRESS: huy@gmail.com
+
+  rabbitmq:
+    image: rabbitmq:4.2-alpine
+    deploy:
+      mode: global
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "8025:8025"
+    deploy:
+      mode: global
+
+  mongo:
+    image: mongo:8
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./db-data/mongo/:/data/db
+    deploy:
+      mode: global
+    environment:
+      MONGO_INITDB_DATABASE: logger-service-db
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+
+  postgres:
+    image: postgres:17
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_DB: auth-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
