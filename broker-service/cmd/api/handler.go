@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/nhathuych/go-microservices-sandbox/broker-service/event"
-	"github.com/nhathuych/go-microservices-sandbox/broker-service/logs"
 	"github.com/nhathuych/go-microservices-sandbox/broker-service/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -236,12 +235,12 @@ func (app *Config) LogViaGRPC(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	c := logs.NewLogServiceClient(conn)
+	c := proto.NewLogServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	_, err = c.WriteLog(ctx, &logs.LogRequest{
-		LogEntry: &logs.Log{
+	_, err = c.WriteLog(ctx, &proto.LogRequest{
+		LogEntry: &proto.Log{
 			Name: requestPayload.Log.Name,
 			Data: requestPayload.Log.Data,
 		},

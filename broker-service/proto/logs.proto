@@ -1,8 +1,8 @@
 syntax = "proto3"; // Khai báo phiên bản Protobuf
 
-package logs; // Namespace nội bộ của Protobuf để tránh xung đột tên gọi giữa các file .proto khác nhau
+package proto; // Namespace nội bộ của Protobuf để tránh xung đột tên gọi giữa các file .proto khác nhau
 
-option go_package = "/logs"; // Chỉ định package khi generate code Go (các file .pb.go)
+option go_package = "./proto"; // Chỉ định package khi generate code Go (các file .pb.go)
 
 message Log {
   string name = 1; // Field Tag 1: Định danh duy nhất cho trường dữ liệu trong quá trình truyền tải nhị phân. Không phải giá trị của biến, mà là ID để hệ thống giải mã (decode) cực nhanh

@@ -4,7 +4,7 @@
 // 	protoc        v3.21.12
 // source: logs.proto
 
-package logs
+package proto
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -166,18 +166,19 @@ var File_logs_proto protoreflect.FileDescriptor
 const file_logs_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"logs.proto\x12\x04logs\"-\n" +
+	"logs.proto\x12\x05proto\"-\n" +
 	"\x03Log\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
-	"\x04data\x18\x02 \x01(\tR\x04data\"3\n" +
+	"\x04data\x18\x02 \x01(\tR\x04data\"4\n" +
 	"\n" +
-	"LogRequest\x12%\n" +
-	"\blogEntry\x18\x01 \x01(\v2\t.logs.LogR\blogEntry\"%\n" +
+	"LogRequest\x12&\n" +
+	"\blogEntry\x18\x01 \x01(\v2\n" +
+	".proto.LogR\blogEntry\"%\n" +
 	"\vLogResponse\x12\x16\n" +
-	"\x06result\x18\x01 \x01(\tR\x06result2=\n" +
+	"\x06result\x18\x01 \x01(\tR\x06result2?\n" +
 	"\n" +
-	"LogService\x12/\n" +
-	"\bWriteLog\x12\x10.logs.LogRequest\x1a\x11.logs.LogResponseB\aZ\x05/logsb\x06proto3"
+	"LogService\x121\n" +
+	"\bWriteLog\x12\x11.proto.LogRequest\x1a\x12.proto.LogResponseB\tZ\a./protob\x06proto3"
 
 var (
 	file_logs_proto_rawDescOnce sync.Once
@@ -193,14 +194,14 @@ func file_logs_proto_rawDescGZIP() []byte {
 
 var file_logs_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_logs_proto_goTypes = []any{
-	(*Log)(nil),         // 0: logs.Log
-	(*LogRequest)(nil),  // 1: logs.LogRequest
-	(*LogResponse)(nil), // 2: logs.LogResponse
+	(*Log)(nil),         // 0: proto.Log
+	(*LogRequest)(nil),  // 1: proto.LogRequest
+	(*LogResponse)(nil), // 2: proto.LogResponse
 }
 var file_logs_proto_depIdxs = []int32{
-	0, // 0: logs.LogRequest.logEntry:type_name -> logs.Log
-	1, // 1: logs.LogService.WriteLog:input_type -> logs.LogRequest
-	2, // 2: logs.LogService.WriteLog:output_type -> logs.LogResponse
+	0, // 0: proto.LogRequest.logEntry:type_name -> proto.Log
+	1, // 1: proto.LogService.WriteLog:input_type -> proto.LogRequest
+	2, // 2: proto.LogService.WriteLog:output_type -> proto.LogResponse
 	2, // [2:3] is the sub-list for method output_type
 	1, // [1:2] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

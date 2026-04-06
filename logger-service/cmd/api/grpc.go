@@ -7,7 +7,7 @@ import (
 	"net"
 
 	"github.com/nhathuych/go-microservices-sandbox/logger-service/data"
-	"github.com/nhathuych/go-microservices-sandbox/logger-service/logs"
+	"github.com/nhathuych/go-microservices-sandbox/logger-service/proto"
 	"google.golang.org/grpc"
 )
 
@@ -15,14 +15,14 @@ import (
 type LogServer struct {
 	// Nhúng (embed) để đảm bảo tính tương thích ngược.
 	// Nếu file .proto thêm hàm mới mà code chưa kịp viết, server vẫn không bị crash.
-	logs.UnimplementedLogServiceServer
+	proto.UnimplementedLogServiceServer
 	// Truy cập vào Database Models để thực hiện ghi log vào MongoDB.
 	Models data.Model
 }
 
 // WriteLog: Triển khai logic thực tế cho hàm RPC đã khai báo trong file .proto.
 // Nhận vào context (quản lý timeout/cancel) và con trỏ LogRequest (dữ liệu từ Client).
-func (l *LogServer) WriteLog(ctx context.Context, req *logs.LogRequest) (*logs.LogResponse, error) {
+func (l *LogServer) WriteLog(ctx context.Context, req *proto.LogRequest) (*proto.LogResponse, error) {
 	// Mapping dữ liệu từ định dạng gRPC (Generated code) sang định dạng Model nội bộ của App.
 	input := req.GetLogEntry() // Lấy dữ liệu LogEntry về từ Request
 	logEntry := data.LogEntry{
@@ -32,12 +32,12 @@ func (l *LogServer) WriteLog(ctx context.Context, req *logs.LogRequest) (*logs.L
 
 	// Ghi vô DB thông qua logic đã viết ở package data.
 	if err := l.Models.LogEntry.Insert(logEntry); err != nil {
-		res := &logs.LogResponse{Result: "failed"}
+		res := &proto.LogResponse{Result: "failed"}
 		return res, err
 	}
 
 	// Trả về phản hồi thành công cho Client dưới dạng con trỏ LogResponse.
-	res := &logs.LogResponse{Result: "logged!"}
+	res := &proto.LogResponse{Result: "logged!"}
 	return res, nil
 }
 
@@ -56,7 +56,7 @@ func (app *Config) gRPCListen() {
 	logServer := &LogServer{Models: app.Model}
 
 	// Kết nối logic code vào hạ tầng mạng gRPC.
-	logs.RegisterLogServiceServer(srv, logServer)
+	proto.RegisterLogServiceServer(srv, logServer)
 
 	log.Printf("gRPC Server started on port %s", gRpcPort)
 

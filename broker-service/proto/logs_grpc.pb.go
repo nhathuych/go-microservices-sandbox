@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: logs.proto
 
-package logs
+package proto
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	LogService_WriteLog_FullMethodName = "/logs.LogService/WriteLog"
+	LogService_WriteLog_FullMethodName = "/proto.LogService/WriteLog"
 )
 
 // LogServiceClient is the client API for LogService service.
@@ -108,7 +108,7 @@ func _LogService_WriteLog_Handler(srv interface{}, ctx context.Context, dec func
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var LogService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "logs.LogService",
+	ServiceName: "proto.LogService",
 	HandlerType: (*LogServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
