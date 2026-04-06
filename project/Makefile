@@ -4,6 +4,7 @@ AUTH_BINARY=authApp
 LOGGER_BINARY=loggerApp
 MAIL_BINARY=mailerApp
 LISTENER_BINARY=listenerApp
+FRONT_BINARY=frontEndApp
 
 .PHONY: $(shell grep -E '^[^[:space:]#]+:' $(MAKEFILE_LIST) | grep -v '=' | cut -d ':' -f 1)
 
@@ -25,6 +26,12 @@ up_build: build_broker build_auth build_logger build_mail build_listener
 down:
 	@echo "Stopping docker compose..."
 	docker compose down
+	@echo "Done!"
+
+## build_front_linux: builds the front end binary as a linux executable
+build_front_linux:
+	@echo "Building front end binary..."
+	cd ../front-end && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${FRONT_BINARY} ./cmd/web
 	@echo "Done!"
 
 ## build_broker: builds the broker binary as a linux executable

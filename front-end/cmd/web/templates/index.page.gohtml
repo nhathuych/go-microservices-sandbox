@@ -37,7 +37,7 @@
 
 {{define "js"}}
 <script>
-  const BROKER_URL = "http://localhost:8081";
+  const BROKER_URL = {{.BrokerURL}};
   const output = document.getElementById("output");
   const sent = document.getElementById("payload");
   const received = document.getElementById("received");

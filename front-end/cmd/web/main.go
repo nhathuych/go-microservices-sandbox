@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -13,8 +14,8 @@ func main() {
 		render(w, "index.page.gohtml")
 	})
 
-	fmt.Println("Starting front end service on port 8080")
-	err := http.ListenAndServe(":8080", nil)
+	fmt.Println("Starting front end service on port 8081")
+	err := http.ListenAndServe(":8081", nil)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -45,8 +46,13 @@ func render(w http.ResponseWriter, t string) {
 		return
 	}
 
+	var data struct {
+		BrokerURL string
+	}
+	data.BrokerURL = os.Getenv("BROKER_URL")
+
 	// execute the template
-	if err := tmpl.Execute(w, nil); err != nil {
+	if err := tmpl.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

@@ -11,6 +11,10 @@ frontApp
 loggerApp
 mailerApp
 listenerApp
+frontEndApp
+
+# Docker volumes
+db-data
 
 # Test binary, built with `go test -c`
 *.test

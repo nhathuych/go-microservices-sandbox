@@ -1,8 +1,28 @@
 version: '3'
 
 services:
+  caddy:
+    image: nhathuych/micro-caddy:1.0.2
+    ports:
+      - "80:80"
+      - "443:443"
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+  front-end:
+    image: nhathuych/front-end:1.0.1
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      BROKER_URL: "http://backend"
+
   broker-service:
-    image: nhathuych/broker-service:1.0.0
+    image: nhathuych/broker-service:1.0.3
     ports:
       - "8081:80"
     deploy:
@@ -71,7 +91,6 @@ services:
 
   postgres:
     image: postgres:17
-    restart: always
     ports:
       - "5432:5432"
     volumes:
@@ -84,3 +103,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       PGDATA: /var/lib/postgresql/data/pgdata
+
+volumes:
+  caddy_data:
+    external: true
+  caddy_config:
