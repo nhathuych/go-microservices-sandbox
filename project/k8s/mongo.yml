@@ -1,0 +1,56 @@
+# === Document 1: Deployment ===
+# Tạo Pod chạy MongoDB (ứng dụng chính)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:8
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        env:
+          - name: MONGO_INITDB_DATABASE
+            value: logger-service-db
+          - name: MONGO_INITDB_ROOT_USERNAME
+            value: admin
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            value: password
+        ports:
+        - containerPort: 27017
+
+# === YAML document separator ===
+# Dấu '---' dùng để tách các resource trong cùng 1 file
+---
+
+# === Document 2: Service ===
+# Tạo Service để expose MongoDB cho các Pod khác truy cập
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  selector:
+    app: mongo
+  ports:
+    - protocol: TCP
+      name: main-port
+      port: 27017       # Port của Service (các Pod khác gọi vô: mongo:27017)
+      targetPort: 27017 # Port bên trong container (MongoDB thực sự chạy ở đây)
