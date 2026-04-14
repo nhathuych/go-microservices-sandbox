@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_DB: auth-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+volumes:
+  pg_data:
