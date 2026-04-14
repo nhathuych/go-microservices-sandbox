@@ -22,7 +22,7 @@ services:
       BROKER_URL: "http://backend"
 
   broker-service:
-    image: nhathuych/broker-service:1.0.3
+    image: nhathuych/broker-service:1.0.4
     ports:
       - "8081:80"
     deploy:

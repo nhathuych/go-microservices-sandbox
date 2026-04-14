@@ -11,17 +11,17 @@ import (
 func (app *Config) route() http.Handler {
 	mux := chi.NewRouter()
 
-	mux.Use(middleware.Recoverer)
-	mux.Use(middleware.StripSlashes)
-	mux.Use(middleware.Heartbeat("/ping"))
-	mux.Use(middleware.Logger)
-	mux.Use(cors.Handler((cors.Options{
+	mux.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"},
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders: []string{"Link"},
 		MaxAge:         300,
-	})))
+	}))
+	mux.Use(middleware.Recoverer)
+	mux.Use(middleware.StripSlashes)
+	mux.Use(middleware.Heartbeat("/ping"))
+	mux.Use(middleware.Logger)
 
 	mux.Post("/", app.Broker)
 
